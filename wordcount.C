@@ -7,7 +7,7 @@
 #include <unistd.h>
 using namespace std;
 
-#define MAXSYM 40
+#define MAXSYM 40.0
 const char *separators = " \t";
 
 typedef struct {
@@ -70,7 +70,7 @@ long word_count(std::string fileName)
     while (wordFile.get(c)){
         curr = c;
         c_count++;
-        *(pstat->CurrentStatus) += c_count;
+        *(pstat->CurrentStatus) += 1;
 
         if(!isspace(curr))
             if(isspace(prev) || prev == NULL){ //NULL for first char in a stream
@@ -103,27 +103,30 @@ void * progress_monitor(void* pstat){
     //print the progress bar
     //cout << "In the thread." << endl;
 
-    long term_val = progstat->TerminationValue;
-    long init_val = progstat->InitialValue;
-
-    while (*(progstat->CurrentStatus) <= term_val) {
-        long progress = (*(progstat->CurrentStatus) - init_val);
-        long total = term_val - init_val;
-        int num_symbols = ((progress / total) * MAXSYM);
-        cout << "Progress: " << progress << ", Total: " << total << ", Num_symbols: " << num_symbols << endl;
-        int i;
-        //string loadbar = "";
+    double term_val = (double) progstat->TerminationValue;
+    double init_val = (double) progstat->InitialValue;
+    double prog_val = 0.0;
+    double total;
+    int num_symbols;
+    int i;
+    string loadbar;
+    
+    while (prog_val <= term_val) {
+        prog_val = (double) *progstat->CurrentStatus;
+        total = (prog_val / term_val);
+        num_symbols = (int) ((total) * MAXSYM);
+        loadbar = "";
         for (i = 1; i <= num_symbols; i++) {
             if (i % 10 == 0) 
-                //loadbar += "+";
-                cout << "+";
+                loadbar += "+";
             else
-                //loadbar += "-";
-                cout << "-";
+                loadbar += "-";
         }
-        cout << flush;
-        if (num_symbols == MAXSYM) {
-            cout << "\nOut of the thread." << endl;
+
+        cout << '\r' << loadbar << flush;
+
+        if (num_symbols == (int) MAXSYM) {
+            cout << endl << "Out of the thread." << endl;
             pthread_exit(NULL);
         }
     }
