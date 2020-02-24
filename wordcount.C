@@ -1,4 +1,8 @@
-#Created by Mark May and Ramiz Hanan
+/*
+Created by Mark May and Ramiz Hanan
+SDSU CS-570 Assignment 3 Multitheading
+*/
+
 #include <fstream>
 #include <iostream>
 #include <pthread.h>
